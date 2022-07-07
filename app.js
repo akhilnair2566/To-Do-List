@@ -1,4 +1,4 @@
-
+// https://frozen-shelf-27437.herokuapp.com
 
 const express = require("express");
 const bodyParser = require("body-parser");
@@ -93,27 +93,33 @@ app.post("/", function(req, res){
   const listName = req.body.list;
   // console.log(listName)
 
-  const item = new Item({
-    name:itemName
-  });
-  // item.save();
-  // res.redirect("/")
-
-  if(listName === "Today"){
-    item.save();
-    res.redirect("/")
+  if(itemName.length === 0){
+    if(listName === "Today"){
+      res.redirect("/")
+    }else{
+      res.redirect("/"+listName);
+    }
   }else{
-    List.findOne({name:listName},function(err,foundList){
-      if(!err){
-        if(foundList){
-          foundList.items.push(item);
-          foundList.save();
-        }else{
-          console.log("Empty");
-        }
-        res.redirect("/"+listName);
-      }
+    const item = new Item({
+      name:itemName
     });
+
+    if(listName === "Today"){
+      item.save();
+      res.redirect("/");
+    }else{
+      List.findOne({name:listName},function(err,foundList){
+        if(!err){
+          if(foundList){
+            foundList.items.push(item);
+            foundList.save();
+          }else{
+            console.log("Empty");
+          }
+          res.redirect("/"+listName);
+        }
+      });
+    }
   }
 });
 
